@@ -139,13 +139,13 @@ router.get('/user/:user_id', async (req, res) => {
 // route:   DELETE api/profile
 // desc:    Delete profile, user & posts
 // access:  Private
-router.get('/', auth, async (req, res) => {
+router.delete('/', auth, async (req, res) => {
   try {
     // TODO: Remove posts
     // Remove profile
     await Profile.findOneAndRemove({ user: req.user.id });
     // Remove user
-    await Profile.findOneAndRemove({ _id: req.user.id });
+    await User.findOneAndRemove({ _id: req.user.id });
     res.json({ msg: 'User removed from database' });
   } catch (err) {
     console.err(err.message);
