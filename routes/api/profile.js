@@ -59,7 +59,7 @@ router.post(
       linkedin,
     } = req.body;
 
-    //Build profile object
+    // Build profile object
     const profileFields = {};
     profileFields.user = req.user.id;
     if (company) profileFields.company = company;
@@ -72,7 +72,7 @@ router.post(
       profileFields.skills = skills.split(',').map((skill) => skill.trim());
     }
 
-    //Build socials object
+    // Build socials object
     profileFields.social = {};
     if (youtube) profileFields.social.youtube = youtube;
     if (twitter) profileFields.social.twitter = twitter;
@@ -83,7 +83,7 @@ router.post(
     try {
       let profile = await Profile.findOne({ user: req.user.id });
       if (profile) {
-        //Update
+        // Update
         profile = await Profile.findOneAndUpdate(
           { user: req.user.id },
           { $set: profileFields },
@@ -91,7 +91,7 @@ router.post(
         );
         return res.json(profile);
       }
-      //Create
+      // Create
       profile = new Profile(profileFields);
       await profile.save();
       res.json(profile);
@@ -132,6 +132,23 @@ router.get('/user/:user_id', async (req, res) => {
     if (err.kind == 'ObjectId') {
       return res.status(400).json({ msg: 'Profile not found' });
     }
+    res.status(500).send('Server Error');
+  }
+});
+
+// route:   DELETE api/profile
+// desc:    Delete profile, user & posts
+// access:  Private
+router.get('/', auth, async (req, res) => {
+  try {
+    // TODO: Remove posts
+    // Remove profile
+    await Profile.findOneAndRemove({ user: req.user.id });
+    // Remove user
+    await Profile.findOneAndRemove({ _id: req.user.id });
+    res.json({ msg: 'User removed from database' });
+  } catch (err) {
+    console.err(err.message);
     res.status(500).send('Server Error');
   }
 });
