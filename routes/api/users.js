@@ -1,12 +1,12 @@
-const express = require('express');
-const router = express.Router();
-const gravatar = require('gravatar');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const config = require('config');
-const { check, validationResult } = require('express-validator');
+import { Router } from 'express';
+const router = Router();
+import { url } from 'gravatar';
+import { genSalt, hash } from 'bcryptjs';
+import { sign } from 'jsonwebtoken';
+import { get } from 'config';
+import { check, validationResult } from 'express-validator';
 
-const User = require('../../models/User');
+import User, { findOne } from '../../models/User';
 
 // route:   POST api/users
 // desc:    Register user
@@ -30,14 +30,14 @@ router.post(
 
     try {
       // Check is user exists
-      let user = await User.findOne({ email });
+      let user = await findOne({ email });
       if (user) {
         return res
           .status(400)
           .json({ errors: [{ msg: 'User already registered' }] });
       }
 
-      const avatar = gravatar.url(email, {
+      const avatar = url(email, {
         s: '200',
         r: 'pg',
         d: 'mm',
@@ -50,8 +50,8 @@ router.post(
         password,
       });
 
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(password, salt);
+      const salt = await genSalt(10);
+      user.password = await hash(password, salt);
       await user.save();
 
       const payload = {
@@ -60,15 +60,10 @@ router.post(
         },
       };
 
-      jwt.sign(
-        payload,
-        config.get('jwtSecret'),
-        { expiresIn: 360000 },
-        (err, token) => {
-          if (err) throw err;
-          res.json({ token });
-        }
-      );
+      sign(payload, get('jwtSecret'), { expiresIn: 360000 }, (err, token) => {
+        if (err) throw err;
+        res.json({ token });
+      });
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server error');
@@ -76,4 +71,4 @@ router.post(
   }
 );
 
-module.exports = router;
+export default router;

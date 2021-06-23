@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
-const config = require('config');
-const db = config.get('mongoURI');
+import { connect } from 'mongoose';
+import { get } from 'config';
+const db = get('mongoURI');
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(db, {
+    await connect(db, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true,
@@ -17,4 +17,4 @@ const connectDB = async () => {
   }
 };
 
-module.exports = connectDB;
+export default connectDB;
