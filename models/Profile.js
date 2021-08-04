@@ -1,8 +1,8 @@
-import { Schema, model } from 'mongoose';
+const mongoose = require('mongoose');
 
-const ProfileSchema = new Schema({
+const ProfileSchema = new mongoose.Schema({
   user: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
   },
   company: {
@@ -109,4 +109,4 @@ const ProfileSchema = new Schema({
   },
 });
 
-export default Profile = model('profile', ProfileSchema);
+module.exports = Profile = mongoose.model('profile', ProfileSchema);

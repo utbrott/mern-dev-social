@@ -1,10 +1,10 @@
-import { Router } from 'express';
-const router = Router();
-import auth from '../../middleware/auth';
-import { check, validationResult } from 'express-validator';
+const express = require('express');
+const router = express.Router();
+const auth = require('../../middleware/auth');
+const { check, validationResult } = require('express-validator');
 
-import Profile from '../../models/Profile';
-import { findOneAndRemove } from '../../models/User';
+const Profile = require('../../models/Profile');
+const User = require('../../models/User');
 
 // route:   GET api/profile/me
 // desc:    Get current current user profile
@@ -69,7 +69,7 @@ router.post(
     if (status) profileFields.status = status;
     if (githubusername) profileFields.githubusername = githubusername;
     if (skills) {
-      profileFields.skills = skills.split(',').map(skill => skill.trim());
+      profileFields.skills = skills.split(',').map((skill) => skill.trim());
     }
 
     // Build socials object
@@ -143,7 +143,7 @@ router.get('/', auth, async (req, res) => {
   try {
     // TODO: Delete posts
     await Profile.findOneAndRemove({ user: req.user.id });
-    await findOneAndRemove({ _id: req.user.id });
+    await User.findOneAndRemove({ _id: req.user.id });
     res.json({ msg: 'User removed' });
   } catch (err) {
     console.err(err.message);
@@ -195,4 +195,4 @@ router.put(
   }
 );
 
-export default router;
+module.exports = router;
